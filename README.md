@@ -1,4 +1,4 @@
-# Decentralized Electoral System on Lisk Blockchain
+# zk-Vote-Africa: Decentralized Electoral System on Lisk Blockchain
 ## Overview
 ### Problem Statement
 Electoral processes, especially in many African countries, face significant challenges, including vote tampering, lack of transparency, disenfranchisement of diaspora voters, and inefficiencies in voter registration and result collation. These issues often undermine the democratic process and erode public trust in electoral outcomes.
