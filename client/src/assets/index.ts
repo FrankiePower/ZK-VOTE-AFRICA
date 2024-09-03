@@ -4,6 +4,7 @@ import onboardThree from './onboard-three.png'
 import onboardFour from './onboard-four.png'
 import registerVoter from './registerVoter.png'
 import voterSelfie from './voter-selfie.png'
+import zkApp from './Zkapp.png'
 
 
 export {
@@ -13,4 +14,5 @@ export {
     onboardFour,
     registerVoter,
     voterSelfie,
+    zkApp,
 }
