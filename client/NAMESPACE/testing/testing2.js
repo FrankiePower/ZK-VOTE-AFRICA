@@ -7,9 +7,7 @@ const web3 = new Web3(
 
 web3.registerPlugin(new EnsPlugin(Chain.Sepolia));
 
-web3.eth.accounts.wallet.add(
-  "0xa20ca6c555f231c801e23f0d359a24cb7d3637c51cb02c5b3be75faef8e4dee3"
-);
+web3.eth.accounts.wallet.add("PRIVATE_KEY");
 
 //const name = "bellemere.eth";
 //const recordKeys = 1;
