@@ -97,8 +97,8 @@ export function RegisterForm({verifyEns}:{verifyEns: (x: string) => void}) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="">
-      <div className="mb-4 w-full">
+    <form onSubmit={handleSubmit} className="flex items-end gap-3">
+      <div className="w-full flex flex-col text-left">
         <label htmlFor="lastName" className="block mb-2 text-black">
           ENS Name
         </label>
