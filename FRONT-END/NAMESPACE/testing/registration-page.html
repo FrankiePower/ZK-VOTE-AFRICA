@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENS Name Registration</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.1/ethers.umd.min.js"></script>
+  </head>
+  <body>
+    <h1>ENS Name Registration</h1>
+    <input
+      type="text"
+      id="ensName"
+      placeholder="Enter desired ENS name (without .eth)"
+    />
+    <button onclick="checkAvailability()">Check Availability</button>
+    <button onclick="registerENS()">Register ENS Name</button>
+    <div id="result"></div>
+
+    <script>
+      let web3;
+      let ensContract;
+      const ENS_CONTRACT_ADDRESS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"; // ENS Registry on Sepolia
+
+      async function initWeb3() {
+        if (typeof window.ethereum !== "undefined") {
+          web3 = new Web3(window.ethereum);
+          await window.ethereum.enable();
+        } else {
+          alert("Please install MetaMask!");
+        }
+      }
+
+      async function checkAvailability() {
+        await initWeb3();
+        const name = document.getElementById("ensName").value;
+        if (!name) {
+          alert("Please enter a name");
+          return;
+        }
+
+        try {
+          const available = await ensContract.methods.available(name).call();
+          document.getElementById("result").innerText = available
+            ? `${name}.eth is available!`
+            : `${name}.eth is not available.`;
+        } catch (error) {
+          document.getElementById(
+            "result"
+          ).innerText = `Error: ${error.message}`;
+        }
+      }
+
+      async function registerENS() {
+        await initWeb3();
+        const name = document.getElementById("ensName").value;
+        if (!name) {
+          alert("Please enter a name");
+          return;
+        }
+
+        try {
+          const accounts = await web3.eth.getAccounts();
+          const tx = await ensContract.methods
+            .register(name, accounts[0])
+            .send({ from: accounts[0] });
+          document.getElementById(
+            "result"
+          ).innerText = `Successfully registered ${name}.eth!`;
+        } catch (error) {
+          document.getElementById(
+            "result"
+          ).innerText = `Error: ${error.message}`;
+        }
+      }
+
+      // Initialize
+      (async function () {
+        await initWeb3();
+        ensContract = new web3.eth.Contract(
+          [
+            {
+              constant: true,
+              inputs: [{ name: "name", type: "string" }],
+              name: "available",
+              outputs: [{ name: "", type: "bool" }],
+              type: "function",
+            },
+            {
+              constant: false,
+              inputs: [
+                { name: "name", type: "string" },
+                { name: "owner", type: "address" },
+              ],
+              name: "register",
+              outputs: [],
+              type: "function",
+            },
+          ],
+          ENS_CONTRACT_ADDRESS
+        );
+      })();
+    </script>
+  </body>
+</html>
