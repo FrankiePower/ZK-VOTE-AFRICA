@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
-import { Wrapper } from "@/components";
+import { Providers, Wrapper } from "@/components";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
@@ -18,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`bg-black ${open_sans.className}`}>
-        <Wrapper>{children}</Wrapper>
+        <Wrapper>
+          <Providers>{children}</Providers>
+        </Wrapper>
       </body>
     </html>
   );
