@@ -1,9 +1,7 @@
 const { Web3 } = require("web3");
 const { Chain, EnsPlugin } = require("@namespace-ens/web3-plugin-ens");
 
-const web3 = new Web3(
-  "https://sepolia.infura.io/v3/2c7f6d8116fd45adb63c13f00c776087"
-);
+const web3 = new Web3("SEPOLIA_RPC_URL");
 
 web3.registerPlugin(new EnsPlugin(Chain.Sepolia));
 
