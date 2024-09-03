@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-black ${open_sans.className} ${space_grotesk.className}`}>
+      <body className={`bg-black ${open_sans.className} ${space_grotesk.variable}`}>
         <Wrapper>
           <Providers>{children}</Providers>
         </Wrapper>

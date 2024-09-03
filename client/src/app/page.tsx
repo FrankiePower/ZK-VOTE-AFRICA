@@ -3,16 +3,14 @@
 import { Onboarding } from "@/components";
 import { useEffect, useState } from "react";
 import { AnimatedSplash } from "@/components";
-import { zkApp } from "@/assets";
-import Image from "next/image";
 
 export default function Home() {
   const [isSplashScreen, setIsSplashScreen] = useState(true);
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   setIsSplashScreen(false);
-    // }, 4500);
+    setTimeout(() => {
+      setIsSplashScreen(false);
+    }, 5000);
   });
 
   return (

@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        'space-grotesk': 'var(--font-space-grotesk)',
+        'space-grotesk': ['var(--font-space-grotesk)'],
       },
       colors: {
         'primary-green': "#1B7339",

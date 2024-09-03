@@ -2,9 +2,13 @@
 
 import React, { Dispatch, useState } from "react";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 import { registerVoter } from "@/assets";
-import { useRouter } from "next/navigation";
 import { MotionWrapper } from "@/components";
+
+const verifyEns = async () => {
+  
+}
 
 const registrationSteps = [
   {
@@ -19,7 +23,7 @@ const registrationSteps = [
   {
     title: "Fill in your details",
     description: "Please provide your ENS to complete the verification process",
-    children: <RegisterForm />,
+    children: <RegisterForm verifyEns={verifyEns}/>,
     buttonText: "Finish",
   },
 ];
@@ -39,10 +43,10 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-center p-6 space-y-10">
+    <div className="flex flex-col items-center justify-center h-screen text-center p-6 space-y-5">
       <MotionWrapper motionKey={currentStep}>
         <div className="max-w-4/5">
-          <h2 className="text-2xl font-extrabold mb-4 text-black">
+          <h2 className="text-2xl font-bold mb-4 text-black">
             {registrationSteps[currentStep].title}
           </h2>
           <p className="mb-8 text-black text-center">
@@ -51,15 +55,14 @@ const Page = () => {
         </div>
       </MotionWrapper>
 
-      <MotionWrapper motionKey={currentStep}>
-        <div className="flex items-center justify-center">
-          {registrationSteps[currentStep].children}
-        </div>
-      </MotionWrapper>
+      <div className="max-w-4/5">
+        {registrationSteps[currentStep].children}
+      </div>
+
 
       <button
         onClick={nextStep}
-        className={`px-10 py-3 mt-8 ${true ? 'bg-primary-green/50 cursor-not-allowed' : 'bg-primary-green'}  text-white font-medium rounded-md hover:opacity-95 transition-colors`}
+        className={`px-10 py-3 mt-8 bg-primary-green text-white font-medium rounded-md hover:opacity-95 transition-colors`}
         disabled={isLoading}
       >
         {registrationSteps[currentStep].buttonText}
@@ -70,7 +73,7 @@ const Page = () => {
 
 export default Page;
 
-export function RegisterForm() {
+export function RegisterForm({verifyEns}:{verifyEns: (x: string) => void}) {
   const [formData, setFormData] = useState({
     ensName: "",
   });
@@ -85,16 +88,18 @@ export function RegisterForm() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form data submitted:", formData);
+
+    await verifyEns(formData.ensName)
     // You can add further form processing logic here (e.g., sending the data to a server)
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col text-left items-start">
-      <div className="mb-4">
-        <label htmlFor="lastName" className="block mb-2">
+    <form onSubmit={handleSubmit} className="">
+      <div className="mb-4 w-full">
+        <label htmlFor="lastName" className="block mb-2 text-black">
           ENS Name
         </label>
         <input
@@ -103,7 +108,7 @@ export function RegisterForm() {
           name="ensName"
           value={formData.ensName}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
           required
         />
       </div>
