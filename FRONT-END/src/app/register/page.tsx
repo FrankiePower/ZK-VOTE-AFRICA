@@ -45,7 +45,11 @@ const Page = () => {
   };
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col items-center justify-center text-center p-6 space-y-10">
+=======
+    <div className="flex flex-col items-center justify-center h-screen text-center p-6 space-y-5">
+>>>>>>> e1536186292adb8523fdda491498a76948198778
       <MotionWrapper motionKey={currentStep}>
         <div className="max-w-4/5">
           <h2 className="text-2xl font-bold mb-4 text-black">
