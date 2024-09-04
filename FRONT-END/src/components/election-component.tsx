@@ -6,18 +6,36 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
+import { useReadContract, useWriteContract, useAccount } from "wagmi";
+import { abi } from '@/lib/contract-abi';
 
 const ElectionComponent = () => {
   const [step, setStep] = useState(1);
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [selectedCandidateImage, setSelectedCandidateImage] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const { writeContract } = useWriteContract();
+  const account = useAccount();
 
   const handleCandidateSelect = (candidate: string, img: any) => {
     setSelectedCandidate(candidate);
     setSelectedCandidateImage(img);
     setStep(3);
   };
+
+  const castVote = async () => {
+    writeContract({ 
+      abi,
+      address: account.address!,
+      functionName: 'transferFrom',
+      args: [
+        '0xd2135CfB216b74109775236E36d4b433F1DF507B',
+        '0xA0Cf798816D4b9b9866b5330EEa46a18382f251e'
+      ],
+   })
+
+  }
+
 
   const handleVoteSubmit = async () => {
     // interact with smart contract and call voting function interaction with contract

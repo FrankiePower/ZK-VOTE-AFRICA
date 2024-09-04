@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Open_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Onboarding, Providers, Wrapper } from "@/components";
+import { Providers } from "@/components";
 import Image from "next/image";
-import { thumbs, voting, voting3, voting4 } from "@/assets";
+import { lisk, voting, voting4 } from "@/assets";
 import Link from "next/link";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import CustomConnectButton from "@/components/custom-connect-button";
 
@@ -36,10 +35,11 @@ export default function RootLayout({
             <div className="flex flex-col min-h-screen bg-gradient-to-br from-white">
               {/* Header */}
               <header className="flex justify-between items-center p-6 md:py-8 sm:px-12 lg:px-16">
-                <div className="text-2xl md:text-3xl font-extrabold text-primary-green font-space-grotesk">
+                <Link href='/' className="text-2xl md:text-3xl font-extrabold text-primary-green font-space-grotesk relative">
+                  <span className="flex items-center gap-1 absolute text-sm lefy-0 sm:-right-14 -bottom-4 text-gray-700 ">powered by lisk <Image src={lisk} alt="hello" width={10} height={10}/></span>
                   ZkVote Africa
-                </div>
-                <nav className="hidden lg:flex space-x-4 md:space-x-8 text-gray-700">
+                </Link>
+                <nav className="hidden lg:flex space-x-4 md:space-x-8 lg:space-x-12 text-gray-700">
                   <Link href="#" className="hover:text-primary-green">
                     Guides
                   </Link>

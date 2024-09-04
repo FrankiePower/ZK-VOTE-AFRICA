@@ -27,6 +27,11 @@ export const abi = [
   },
   {
     inputs: [],
+    name: "CandidateNotFound",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "ECDSAInvalidSignature",
     type: "error",
   },
@@ -54,7 +59,57 @@ export const abi = [
   },
   {
     inputs: [],
+    name: "ElectionConcluded",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidSignature",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidVotingPeriod",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "ReentrancyGuardReentrantCall",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "UnauthorizedVoterRegistration",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VoterAlreadyRegistered",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VoterAlreadyVoted",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VoterNotRegistered",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VotingPeriodActive",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VotingPeriodInactive",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ZeroAddressForbidden",
     type: "error",
   },
   {
@@ -78,8 +133,15 @@ export const abi = [
   },
   {
     anonymous: false,
-    inputs: [],
-    name: "ResultsReleased",
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "currentTime",
+        type: "uint256",
+      },
+    ],
+    name: "ResultsTallied",
     type: "event",
   },
   {
@@ -168,7 +230,7 @@ export const abi = [
       },
       {
         indexed: false,
-        internalType: "enum ZKVoteAfrica.VoterType",
+        internalType: "enum ZKVoting.VoterType",
         name: "voterType",
         type: "uint8",
       },
@@ -187,7 +249,7 @@ export const abi = [
       },
       {
         indexed: false,
-        internalType: "enum ZKVoteAfrica.VoterType",
+        internalType: "enum ZKVoting.VoterType",
         name: "voterType",
         type: "uint8",
       },
@@ -356,12 +418,12 @@ export const abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "resident",
+        name: "",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "diaspora",
+        name: "",
         type: "uint256",
       },
     ],
@@ -418,19 +480,12 @@ export const abi = [
         type: "address",
       },
       {
-        internalType: "enum ZKVoteAfrica.VoterType",
+        internalType: "enum ZKVoting.VoterType",
         name: "_voterType",
         type: "uint8",
       },
     ],
     name: "registerVoter",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "releaseResults",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -455,7 +510,7 @@ export const abi = [
   },
   {
     inputs: [],
-    name: "resultsReleased",
+    name: "resultsTallied",
     outputs: [
       {
         internalType: "bool",
@@ -522,15 +577,37 @@ export const abi = [
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "tallyVotes",
+    outputs: [
       {
-        internalType: "address",
-        name: "_voter",
-        type: "address",
+        components: [
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "name",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "residentVotes",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "diasporaVotes",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct ZKVoting.Candidate[]",
+        name: "",
+        type: "tuple[]",
       },
     ],
-    name: "tallyVote",
-    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -555,25 +632,6 @@ export const abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_voter",
-        type: "address",
-      },
-    ],
-    name: "verifyVote",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
       },
     ],
     stateMutability: "view",
