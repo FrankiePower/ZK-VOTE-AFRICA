@@ -1,4 +1,4 @@
-# zk-Vote-Africa: Decentralized Electoral System on Lisk Blockchain
+# Zk-Vote-Africa: Decentralized Voting System on the Lisk Blockchain
 
 ## Overview
 
@@ -8,21 +8,40 @@ Electoral processes, especially in many African countries, face significant chal
 
 ### Solution
 
-Our solution is a decentralized electoral system built on the Lisk blockchain. This system ensures transparency, security, and efficiency in electoral processes by leveraging smart contracts, decentralized storage, and blockchain technology. The system allows for secure voter registration, transparent vote casting, accurate result collation, and the inclusion of diaspora voters. Additionally, zk-SNARKs technology is used to anonymize casted votes, ensuring voter privacy.
+Our solution is a decentralized electoral system built on the Lisk blockchain. This system ensures transparency, security,anonymity and efficiency in electoral processes by leveraging smart contracts, decentralized storage, and blockchain technology. The system allows for secure voter registration, transparent vote casting, accurate result collation, and the inclusion of diaspora voters. Additionally, we used ECDSA cryptography to anonymize casted votes, ensuring voter privacy.
 
 ## Key Features
 
-- Voter Registration: A secure and decentralized process for registering eligible voters, storing their data on IPFS/Pinata, and ensuring each voter is uniquely identified.
-- Vote Casting: A transparent and tamper-proof mechanism for casting votes, with zk-SNARKs used to anonymize votes.
-- Result Collation: Accurate and verifiable collation of votes, with results being publicly accessible and immutable.
-- Diaspora Voting: Inclusion of diaspora voters, allowing them to securely participate in the electoral process from anywhere in the world.
+- Ethereum Name Service(ENS)
+
+  - Unique approach to voter registration and verification.
+  - Ensures one-person-one-vote principle.
+
+  Decentralized Voting System
+
+  - Leverages blockchain technology for transparency and security.
+  - Eliminates central points of failure and manipulation.
+
+  Anonymous Vote Casting
+
+  - Protects voter privacy.
+  - Reduces the risk of voter intimidation and bribery.
+
+  Diaspora Voting Support
+
+  - Enables African citizens abroad to participate in elections
+  - Increases inclusivity in the democratic process
+
+  Secure Vote Collation
+
+  - Automated and tamper-proof vote counting
+  - Reduces human error and potential for manipulation
 
 ## Technology Stack
 
 ### Backend:
 
 - Lisk Blockchain: Used for deploying smart contracts that manage voter registration, vote casting, and result collation.
-- IPFS/Pinata: Utilized for decentralized storage of voter data, ensuring that sensitive information is securely stored and easily retrievable.
 
 ### Frontend:
 
@@ -37,17 +56,17 @@ Our solution is a decentralized electoral system built on the Lisk blockchain. T
 - Objective: Identify and understand the key issues in the current electoral systems, particularly in African countries.
 - Approach:
   - Conduct research and gather insights from stakeholders in the electoral process.
-  - Define the requirements for the decentralized electoral system, including voter registration, vote casting, result collation, and diaspora voting.
+  - Define the requirements for the decentralized electoral system, including voter registration and verification, vote casting, result collation, and diaspora voting.
   - Design the system architecture and create UI/UX wireframes.
 
 ### Phase 2: Smart Contract Development
 
-- Objective: Develop smart contracts that ensure secure, transparent, and efficient management of voter registration, voting, and result collation.
+- Objective: Develop smart contracts that ensure secure, transparent, and efficient management of voter registration and registration, voting, and result collation.
 - Approach:
-  - Develop the Voter Registration Contract to handle the decentralized registration of voters.
+  - Develop the Voter verification script to verify ENS names.
   - Implement the Voting Contract to securely manage vote casting, ensuring each vote is recorded and counted transparently.
   - Create the Collation Contract to aggregate and finalize voting results, ensuring the integrity and accuracy of the electoral outcomes.
-  - Use zk-SNARKs for anonymizing casted votes, protecting voter privacy.
+  - Use ECDSA cryptography for anonymizing casted votes, protecting voter privacy.
   - Deploy and test the smart contracts on the Lisk testnet before deploying to the mainnet.
 
 ### Phase 3: Frontend Development
@@ -59,15 +78,7 @@ Our solution is a decentralized electoral system built on the Lisk blockchain. T
   - Use Web3.js to connect the frontend with the smart contracts deployed on the Lisk blockchain.
   - Implement user flows for voter registration, vote casting, and result viewing.
 
-### Phase 4: IPFS/Pinata Integration
-
-- Objective: Securely store and manage voter data using decentralized storage.
-- Approach:
-  - Integrate IPFS/Pinata with the smart contracts and frontend.
-  - Store voter data on IPFS/Pinata, ensuring it is secure, immutable, and decentralized.
-  - Retrieve and display stored voter data within the dApp as needed, ensuring data integrity.
-
-### Phase 5: Testing, Security Audit, and Deployment
+### Phase 4: Testing, Security Audit, and Deployment
 
 - Objective: Ensure the system is secure, reliable, and ready for deployment.
 - Approach:
@@ -75,7 +86,7 @@ Our solution is a decentralized electoral system built on the Lisk blockchain. T
   - Perform a security audit on the smart contracts and the overall system to identify and fix vulnerabilities.
   - Deploy the smart contracts on the Lisk mainnet and launch the frontend application on a cloud service or decentralized hosting.
 
-### Phase 6: Maintenance and Future Enhancements
+### Phase 5: Maintenance and Future Enhancements
 
 - Objective: Continuously improve the system and add new features based on feedback and evolving needs.
 - Approach:
@@ -90,7 +101,7 @@ Our solution is a decentralized electoral system built on the Lisk blockchain. T
 - Node.js (v16 or later)
 - NPM or Yarn
 - Lisk SDK
-- IPFS CLI
+- Web3.js namespace plugin
 - React.js
 
 ## Installation
@@ -98,7 +109,7 @@ Our solution is a decentralized electoral system built on the Lisk blockchain. T
 ### Clone the Repository:
 
 ```
-git clone https://github.com/your-repo/decentralized-electoral-system.git
+git clone '"
 cd decentralized-electoral-system
 ```
 
@@ -110,14 +121,10 @@ npm install
 yarn install
 ```
 
-### Set Up IPFS/Pinata:
-
-Follow the Pinata documentation to set up your account and get API keys.
-Store the API keys in a .env file.
-
 ### Configure Lisk SDK:
 
 Set up your Lisk environment following the Lisk SDK documentation.
+Store the API keys in a .env file.
 
 ### Deploy Smart Contracts:
 
