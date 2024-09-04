@@ -6,7 +6,19 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
-contract ZKVoting is ReentrancyGuard, AccessControl {
+contract ZKVoting is AccessControl, ReentrancyGuard {
+    error CandidateNotFound();
+    error ElectionConcluded();
+    error InvalidSignature();
+    error InvalidVotingPeriod();
+    error UnauthorizedVoterRegistration();
+    error VoterAlreadyRegistered();
+    error VoterAlreadyVoted();
+    error VoterNotRegistered();
+    error VotingPeriodActive();
+    error VotingPeriodInactive();
+    error ZeroAddressForbidden();
+
     using ECDSA for bytes32;
 
     bytes32 public constant ELECTION_OFFICIAL = keccak256("ELECTION_OFFICIAL");
@@ -37,19 +49,20 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
 
     mapping(address => Voter) private voters;
     mapping(address => Vote) private votes;
+    address[] private voterAddresses; // Array to store voter addresses
     Candidate[] public candidates;
 
     uint256 public votingStart;
     uint256 public votingEnd;
     uint256 public totalResidentVoters;
     uint256 public totalDiasporaVoters;
-    bool public resultsReleased;
+    bool public resultsTallied;
 
     event CandidateAdded(uint256 indexed candidateId, string name);
-    event VoteCast(address indexed voter, VoterType voterType);
     event VoterRegistered(address indexed voter, VoterType voterType);
     event VotingPeriodSet(uint256 start, uint256 end);
-    event ResultsReleased();
+    event VoteCast(address indexed voter, VoterType voterType);
+    event ResultsTallied(uint256 currentTime);
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -58,19 +71,26 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
     }
 
     function registerVoter(address _voter, VoterType _voterType) external {
-        require(
-            (hasRole(ELECTION_OFFICIAL, msg.sender) &&
-                _voterType == VoterType.Resident) ||
-                (hasRole(DIASPORA_OFFICIAL, msg.sender) &&
-                    _voterType == VoterType.Diaspora),
-            "Unauthorized to register this voter type"
-        );
+        if (
+            !(hasRole(ELECTION_OFFICIAL, msg.sender) &&
+                _voterType == VoterType.Resident) &&
+            !(hasRole(DIASPORA_OFFICIAL, msg.sender) &&
+                _voterType == VoterType.Diaspora)
+        ) {
+            revert UnauthorizedVoterRegistration();
+        }
 
-        require(msg.sender != address(0), "Cannot register from Zero address");
-        require(!voters[_voter].isRegistered, "Voter already registered");
+        if (msg.sender == address(0)) {
+            revert ZeroAddressForbidden();
+        }
+
+        if (voters[_voter].isRegistered) {
+            revert VoterAlreadyRegistered();
+        }
 
         voters[_voter].isRegistered = true;
         voters[_voter].voterType = _voterType;
+        voterAddresses.push(_voter);
 
         if (_voterType == VoterType.Resident) {
             totalResidentVoters++;
@@ -102,12 +122,12 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
         uint256 _start,
         uint256 _end
     ) external onlyRole(ELECTION_OFFICIAL) {
-        require(_start > 0 && _end > 0, "Cannot set time period to zero");
-        require(_start < _end, "Invalid voting period");
+        if (_start >= _end) {
+            revert InvalidVotingPeriod();
+        }
 
         votingStart = _start;
         votingEnd = _end;
-
         emit VotingPeriodSet(_start, _end);
     }
 
@@ -115,20 +135,28 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
         uint256 _candidateId,
         bytes memory _signature
     ) external nonReentrant {
-        require(
-            block.timestamp >= votingStart && block.timestamp <= votingEnd,
-            "Voting is not active"
-        );
-        require(voters[msg.sender].isRegistered, "Not registered to vote");
-        require(!voters[msg.sender].hasVoted, "Already voted");
-        require(_candidateId < candidates.length, "Invalid candidate ID");
+        if (block.timestamp < votingStart || block.timestamp > votingEnd) {
+            revert VotingPeriodInactive();
+        }
+
+        if (!voters[msg.sender].isRegistered) {
+            revert VoterNotRegistered();
+        }
+
+        if (voters[msg.sender].hasVoted) {
+            revert VoterAlreadyVoted();
+        }
+
+        if (_candidateId >= candidates.length) {
+            revert CandidateNotFound();
+        }
 
         // Verify the vote signature
-        require(
-            verifyVote(msg.sender, _candidateId, _signature),
-            "Invalid signature"
-        );
+        if (!verifyVote(msg.sender, _candidateId, _signature)) {
+            revert InvalidSignature();
+        }
 
+        // Mark the voter as having voted
         voters[msg.sender].hasVoted = true;
         votes[msg.sender] = Vote(_candidateId, _signature);
 
@@ -139,7 +167,7 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
         address _voter,
         uint256 _candidateId,
         bytes memory _signature
-    ) internal view returns (bool) {
+    ) internal pure returns (bool) {
         bytes32 messageHash = keccak256(abi.encodePacked(_voter, _candidateId));
         bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
             messageHash
@@ -148,18 +176,29 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
         return signer == _voter;
     }
 
-    function tallyVotes() external onlyRole(ELECTION_OFFICIAL) {
-        require(block.timestamp > votingEnd, "Voting is still active");
-        require(!resultsReleased, "Results already released");
+    function tallyVotes()
+        external
+        onlyRole(ELECTION_OFFICIAL)
+        returns (Candidate[] memory)
+    {
+        if (block.timestamp <= votingEnd) {
+            revert VotingPeriodActive();
+        }
 
-        // Tally votes for all voters
+        if (resultsTallied) {
+            revert ElectionConcluded();
+        }
+
+        // Reset candidate vote counts
         for (uint256 i = 0; i < candidates.length; i++) {
             candidates[i].residentVotes = 0;
             candidates[i].diasporaVotes = 0;
         }
 
-        for (uint256 i = 0; i < voters.length; i++) {
-            address voter = voters[i];
+        // Tally votes for all voters
+        for (uint256 i = 0; i < voterAddresses.length; i++) {
+            address voter = voterAddresses[i];
+
             if (voters[voter].hasVoted) {
                 Vote memory vote = votes[voter];
 
@@ -174,8 +213,13 @@ contract ZKVoting is ReentrancyGuard, AccessControl {
             }
         }
 
-        resultsReleased = true;
-        emit ResultsReleased();
+        // Clear the voterAddresses array in a single operation
+        delete voterAddresses;
+
+        resultsTallied = true;
+        emit ResultsTallied(block.timestamp);
+
+        return candidates;
     }
 
     function getCandidateCount() external view returns (uint256) {
