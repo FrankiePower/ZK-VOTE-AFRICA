@@ -39,7 +39,7 @@ const Page = () => {
     if (currentStep < registrationSteps.length - 1 && currentStep >= 0) {
       setCurrentStep(currentStep + 1);
     } else {
-      router.push("/elections");
+      router.push("/elections/presidential");
       setIsLoading(true);
     }
   };

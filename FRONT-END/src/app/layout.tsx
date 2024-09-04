@@ -26,21 +26,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-<<<<<<< HEAD
       <body className={`${open_sans.className} ${space_grotesk.variable}`}>
         <Providers>
           <div className="w-full">
             <>
-              <Image src={voting4} alt="" className="absolute top-[22%] right-[40%] w-20 h-20 hidden md:block"/>
-              <Image src={voting3} alt="" className="absolute bottom-[19%] left-[36%] w-32 h-32 hidden md:block"/>
+              <Image src={voting4} alt="" className="absolute top-[29%] right-[44%] w-20 h-20 hidden md:block"/>
             </>
             <div className="flex flex-col min-h-screen bg-gradient-to-br from-white">
               {/* Header */}
-              <header className="flex justify-between items-center p-6 md:py-8 md:px-16">
+              <header className="flex justify-between items-center p-6 md:py-8 sm:px-12 lg:px-16">
                 <div className="text-2xl md:text-3xl font-extrabold text-primary-green font-space-grotesk">
                   ZkVote Africa
                 </div>
-                <nav className="hidden md:flex space-x-4 md:space-x-8 text-gray-700">
+                <nav className="hidden lg:flex space-x-4 md:space-x-8 text-gray-700">
                   <Link href="#" className="hover:text-primary-green">
                     Guides
                   </Link>
@@ -76,12 +74,6 @@ export default function RootLayout({
             </div>
           </div>
         </Providers>
-=======
-      <body className={`bg-black ${open_sans.className} ${space_grotesk.variable}`}>
-        <Wrapper>
-          <Providers>{children}</Providers>
-        </Wrapper>
->>>>>>> e1536186292adb8523fdda491498a76948198778
       </body>
     </html>
   );

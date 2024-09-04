@@ -144,7 +144,7 @@ const VerifiedModal = ({
                         key={index}
                         className="flex justify-start items-start p-2 rounded-xl bg-gray-50 border border-gray-300 w-auto cursor-pointer"
                       >
-                        <span className="ml-2 text-sm font-medium text-gray-900">
+                        <span className="ml-2 text-sm font-medium text-gray-900 truncate">
                           {detail.value}
                         </span>
                       </div>
@@ -158,7 +158,7 @@ const VerifiedModal = ({
               <p className="text-sm text-left text-gray-600 mb-1">
                 Ethereum Address:
               </p>
-              <p className="text-sm font-medium text-gray-900 break-words truncate flex justify-start items-start p-2 rounded-xl bg-gray-50 border border-gray-300 w-auto cursor-pointer">
+              <p className="text-sm font-medium text-gray-900 truncate flex justify-start items-start p-2 rounded-xl bg-gray-50 border border-gray-300 w-auto cursor-pointer">
                 {ethAddress}
               </p>
             </div>
@@ -184,7 +184,7 @@ const VerifiedModal = ({
               !ethAddress || ethAddress === zeroAddress
                 ? onClose
                 : verified
-                ? () => router.push("/elections")
+                ? () => router.push("/elections/presidential")
                 : account.address && (() => verifyOwnership(ensName!))
             }
             className={`${
