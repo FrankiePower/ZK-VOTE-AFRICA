@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract ImprovedAfricanElectoralSystemWithDiaspora is ReentrancyGuard, AccessControl {
+contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
     using ECDSA for bytes32;
 
     bytes32 public constant ELECTION_OFFICIAL = keccak256("ELECTION_OFFICIAL");
