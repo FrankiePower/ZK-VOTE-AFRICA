@@ -184,7 +184,7 @@ const VerifiedModal = ({
               !ethAddress || ethAddress === zeroAddress
                 ? onClose
                 : verified
-                ? () => router.push("/elections/presidential")
+                ? () => router.push("/elections")
                 : account.address && (() => verifyOwnership(ensName!))
             }
             className={`${
