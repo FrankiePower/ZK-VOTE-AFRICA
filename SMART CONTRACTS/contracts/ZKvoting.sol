@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
     using ECDSA for bytes32;
@@ -11,7 +12,10 @@ contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
     bytes32 public constant ELECTION_OFFICIAL = keccak256("ELECTION_OFFICIAL");
     bytes32 public constant DIASPORA_OFFICIAL = keccak256("DIASPORA_OFFICIAL");
 
-    enum VoterType { Resident, Diaspora }
+    enum VoterType {
+        Resident,
+        Diaspora
+    }
 
     struct Voter {
         bool isRegistered;
@@ -34,7 +38,7 @@ contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
     mapping(address => Voter) private voters;
     mapping(address => Vote) private votes;
     Candidate[] public candidates;
-    
+
     uint256 public votingStart;
     uint256 public votingEnd;
     uint256 public totalResidentVoters;
@@ -55,14 +59,25 @@ contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
 
     // ... [Other functions remain the same] ...
 
-    function castVote(uint256 _candidateId, bytes memory _signature) external nonReentrant {
-        require(block.timestamp >= votingStart && block.timestamp <= votingEnd, "Voting is not active");
+    function castVote(
+        uint256 _candidateId,
+        bytes memory _signature
+    ) external nonReentrant {
+        require(
+            block.timestamp >= votingStart && block.timestamp <= votingEnd,
+            "Voting is not active"
+        );
         require(voters[msg.sender].isRegistered, "Not registered to vote");
         require(!voters[msg.sender].hasVoted, "Already voted");
+        require(_candidateId < candidates.length, "Invalid candidate ID");
 
-        bytes32 messageHash = keccak256(abi.encodePacked(msg.sender, _candidateId));
-        bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
-        address signer = ethSignedMessageHash.recover(_signature);
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(msg.sender, _candidateId)
+        );
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
+            messageHash
+        );
+        address signer = ECDSA.recover(ethSignedMessageHash, _signature);
 
         require(signer == msg.sender, "Invalid signature");
 
@@ -72,28 +87,32 @@ contract ZKVoteAfrica is ReentrancyGuard, AccessControl {
         emit VoteCast(msg.sender, voters[msg.sender].voterType);
     }
 
-    function verifyVote(address _voter) external view returns (bool) {
-    require(voters[_voter].hasVoted, "Voter has not cast a vote");
-    Vote memory vote = votes[_voter];
-    bytes32 messageHash = keccak256(abi.encodePacked(_voter, vote.candidateId));
-    bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
-    address signer = ethSignedMessageHash.recover(vote.signature);
-    return signer == _voter;
-}
+    function verifyVote(address _voter) public view returns (bool) {
+        require(voters[_voter].hasVoted, "Voter has not cast a vote");
+        Vote memory vote = votes[_voter];
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(_voter, vote.candidateId)
+        );
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
+            messageHash
+        );
+        address signer = ECDSA.recover(ethSignedMessageHash, vote.signature);
+        return signer == _voter;
+    }
 
     function tallyVote(address _voter) external onlyRole(ELECTION_OFFICIAL) {
         require(voters[_voter].hasVoted, "Voter has not cast a vote");
         require(!resultsReleased, "Results already released");
         require(verifyVote(_voter), "Vote verification failed");
-        
+
         Vote memory vote = votes[_voter];
-        
+
         if (voters[_voter].voterType == VoterType.Resident) {
             candidates[vote.candidateId].residentVotes++;
         } else {
             candidates[vote.candidateId].diasporaVotes++;
         }
-        
+
         // Clear the vote to prevent double counting
         delete votes[_voter];
     }
