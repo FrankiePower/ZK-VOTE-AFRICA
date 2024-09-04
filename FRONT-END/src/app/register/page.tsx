@@ -1,37 +1,39 @@
 "use client";
 
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { registerVoter } from "@/assets";
-import { MotionWrapper } from "@/components";
-
-const verifyEns = async () => {
-  
-}
-
-const registrationSteps = [
-  {
-    title: "Voter Verification",
-    description:
-      "Securely verify your identity and get ready to cast your vote.",
-    children: (
-      <Image src={registerVoter} alt="voter-registration-illustration" />
-    ),
-    buttonText: "Verify ENS",
-  },
-  {
-    title: "Fill in your details",
-    description: "Please provide your ENS to complete the verification process",
-    children: <RegisterForm verifyEns={verifyEns}/>,
-    buttonText: "Finish",
-  },
-];
+import { MotionWrapper, VerifiedModal } from "@/components";
+import { verifyEns } from "@/lib";
+import { LoaderCircle } from "lucide-react";
 
 const Page = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [verifiedData, setVerifiedData] = useState<any | null>(null);
+  const [ensName, setEnsName] = useState('');
   const router = useRouter();
+
+  const registrationSteps = [
+    {
+      title: "Voter Verification",
+      description:
+        "Securely verify your identity and get ready to cast your vote.",
+      children: (
+        <Image src={registerVoter} alt="voter-registration-illustration" />
+      ),
+      buttonText: "Verify ENS",
+      ver: false,
+    },
+    {
+      title: "Fill in your details",
+      description: "Please provide your ENS to complete the verification process",
+      children: <RegisterForm verifyEns={verifyEns} setVerifiedData={setVerifiedData} setEnsName={setEnsName}/>,
+      buttonText: "Finish",
+      ver: true,
+    },
+  ];
 
   const nextStep = () => {
     if (currentStep < registrationSteps.length - 1 && currentStep >= 0) {
@@ -43,7 +45,7 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-center p-6 space-y-5">
+    <div className="flex flex-col items-center justify-center text-center p-6 space-y-10">
       <MotionWrapper motionKey={currentStep}>
         <div className="max-w-4/5">
           <h2 className="text-2xl font-bold mb-4 text-black">
@@ -55,28 +57,45 @@ const Page = () => {
         </div>
       </MotionWrapper>
 
-      <div className="max-w-4/5">
-        {registrationSteps[currentStep].children}
-      </div>
+      <VerifiedModal
+        isOpen={!!verifiedData}
+        onClose={() => setVerifiedData(null)}
+        ethAddress={verifiedData?.address}
+        details={verifiedData?.details}
+        ensName={ensName}
+      />
 
+      <div className="max-w-4/5">{registrationSteps[currentStep].children}</div>
 
-      <button
-        onClick={nextStep}
-        className={`px-10 py-3 mt-8 bg-primary-green text-white font-medium rounded-md hover:opacity-95 transition-colors`}
-        disabled={isLoading}
-      >
-        {registrationSteps[currentStep].buttonText}
-      </button>
+      {!registrationSteps[currentStep].ver && (
+        <button
+          onClick={nextStep}
+          className={`px-10 py-3 mt-8 bg-primary-green text-white font-medium rounded-md hover:opacity-95 transition-colors`}
+          disabled={isLoading}
+        >
+          {registrationSteps[currentStep].buttonText}
+        </button>
+      )}
     </div>
   );
 };
 
 export default Page;
 
-export function RegisterForm({verifyEns}:{verifyEns: (x: string) => void}) {
+export function RegisterForm({
+  verifyEns,
+  setVerifiedData,
+  setEnsName,
+}: {
+  verifyEns: (x: string) => void,
+  setVerifiedData: Dispatch<SetStateAction<any>>,
+  setEnsName: Dispatch<SetStateAction<string>>,
+}) {
   const [formData, setFormData] = useState({
     ensName: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -90,9 +109,14 @@ export function RegisterForm({verifyEns}:{verifyEns: (x: string) => void}) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     console.log("Form data submitted:", formData);
 
-    await verifyEns(formData.ensName)
+    const res = await verifyEns(formData.ensName);
+    console.log(res);
+    setVerifiedData(res);
+    setEnsName(formData.ensName);
+    setLoading(false);
     // You can add further form processing logic here (e.g., sending the data to a server)
   };
 
@@ -114,9 +138,10 @@ export function RegisterForm({verifyEns}:{verifyEns: (x: string) => void}) {
       </div>
       <button
         type="submit"
-        className="w-full bg-primary-green text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2"
+        disabled={loading}
+        className="w-full bg-primary-green text-white px-4 py-2 rounded-md"
       >
-        Verify
+        {loading ? <LoaderCircle className="animate-spin"/> : "Verify"}
       </button>
     </form>
   );

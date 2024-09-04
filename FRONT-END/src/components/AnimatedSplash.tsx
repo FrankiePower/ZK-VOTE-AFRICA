@@ -20,7 +20,7 @@ const logoTexts = [
 
 const AnimatedSplash = () => {
   return (
-    <div className="flex items-center justify-center h-screen bg-black/90 text-white">
+    <div className="flex items-center justify-center">
       <div className="flex items-end">
         {logoTexts.map((letter, index) => (
           <motion.h1
@@ -39,7 +39,7 @@ const AnimatedSplash = () => {
               ease: "easeInOut",
               delay: 2.2 + (index + 1) / 10,
             }}
-            className="h-5 font-space-grotesk"
+            className="text-4xl font-space-grotesk"
             key={index}
           >
             {letter}

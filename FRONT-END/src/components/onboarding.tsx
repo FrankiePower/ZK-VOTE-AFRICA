@@ -53,19 +53,12 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-center p-6">
+    <div className="flex flex-col items-start justify-center text-center">
      <MotionWrapper motionKey={currentStep}>
-        <div className="">
-          <Image
-            src={onboardingSteps[currentStep].image}
-            alt="Onboarding"
-            className="max-w-[250px] mx-auto h-auto mb-8"
-          />
-        </div>
-        <h2 className="text-2xl font-extrabold mb-4 text-black">
+        <h2 className="text-2xl md:text-4xl font-extrabold text-left mb-4 text-black">
           {onboardingSteps[currentStep].title}
         </h2>
-        <p className="mb-8 text-black text-center">{onboardingSteps[currentStep].description}</p>
+        <p className="mb-8 text-black text-left md:text-lg">{onboardingSteps[currentStep].description}</p>
       </MotionWrapper>
 
       <div className="flex space-x-2 mb-8">

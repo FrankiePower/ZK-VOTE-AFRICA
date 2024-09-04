@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import ElectionComponent from "@/components/election-component";
 
 const Page = () => {
-  return (
-    <div>Elections</div>
-  )
-}
+  return <ElectionComponent />;
+};
 
-export default Page
+export default Page;
