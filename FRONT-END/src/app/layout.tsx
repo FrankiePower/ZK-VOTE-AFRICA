@@ -7,6 +7,7 @@ import { thumbs, voting, voting3, voting4 } from "@/assets";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
+import CustomConnectButton from "@/components/custom-connect-button";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 const space_grotesk = Space_Grotesk({
@@ -53,7 +54,7 @@ export default function RootLayout({
                   </Link>
                 </nav>
                 <div>
-                  <ConnectButton/>
+                  <CustomConnectButton/>
                 </div>
               </header>
 
