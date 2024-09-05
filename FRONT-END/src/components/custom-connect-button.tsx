@@ -1,5 +1,4 @@
-"use client"; // Ensuring this is a Client Component
-
+"use client";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function CustomConnectButton() {

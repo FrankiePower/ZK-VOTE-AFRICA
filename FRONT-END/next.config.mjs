@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "euc.li",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "cryptologos.cc",
+        port: "",
+      },
     ],
   },
 };

@@ -1,11 +1,8 @@
-import React from 'react'
+import ElectionAnalytics from "@/components/election-analytics";
+import React from "react";
 
 const Page = () => {
-  return (
-    <div>
-        
-    </div>
-  )
-}
+  return <ElectionAnalytics />;
+};
 
-export default Page
+export default Page;
