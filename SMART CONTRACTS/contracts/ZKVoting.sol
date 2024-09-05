@@ -176,11 +176,7 @@ contract ZKVoting is AccessControl, ReentrancyGuard {
         return signer == _voter;
     }
 
-    function tallyVotes()
-        external
-        onlyRole(ELECTION_OFFICIAL)
-        returns (Candidate[] memory)
-    {
+    function tallyVotes() external onlyRole(ELECTION_OFFICIAL) {
         if (block.timestamp <= votingEnd) {
             revert VotingPeriodActive();
         }
@@ -217,8 +213,11 @@ contract ZKVoting is AccessControl, ReentrancyGuard {
         delete voterAddresses;
 
         resultsTallied = true;
-        emit ResultsTallied(block.timestamp);
 
+        emit ResultsTallied(block.timestamp);
+    }
+
+    function getCandidates() external view returns (Candidate[] memory) {
         return candidates;
     }
 
