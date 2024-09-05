@@ -70,7 +70,7 @@ const VerifiedModal = ({
       if (verifyResult) {
         writeContract({
           abi,
-          address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+          address: "0xbA2DbEfAfA35B2881F4CbB0041133De9BB23785D",
           functionName: "registerVoter",
           args: [account.address, voterType],
         });

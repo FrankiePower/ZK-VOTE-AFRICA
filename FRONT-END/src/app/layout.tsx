@@ -51,17 +51,20 @@ export default function RootLayout({
                   ZkVote Africa
                 </Link>
                 <nav className="hidden md:flex space-x-4 md:space-x-8 lg:space-x-12 text-gray-700">
-                  <Link href="/elections" className="hover:text-primary-green">
-                    Elections
-                  </Link>
                   <Link href="/register" className="hover:text-primary-green">
                     Register
                   </Link>
-                  <Link href="#" className="hover:text-primary-green">
-                    Guides
+                  <Link href="/elections" className="hover:text-primary-green">
+                    Elections
+                  </Link>
+                  <Link
+                    href="/elections/results"
+                    className="hover:text-primary-green"
+                  >
+                    Results
                   </Link>
                   <Link href="#" className="hover:text-primary-green">
-                    About
+                    Guides
                   </Link>
                 </nav>
                 <div>

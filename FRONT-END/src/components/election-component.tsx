@@ -50,16 +50,16 @@ const ElectionComponent = () => {
 
   const { data: candidates } = useReadContract({
     abi,
-    address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+    address: "0xbA2DbEfAfA35B2881F4CbB0041133De9BB23785D",
     functionName: "getCandidates",
   });
 
   const account = useAccount();
 
   const handleCandidateSelect = (candidate: string, img: any, id: number) => {
+    setSelectedCandidateId(id);
     setSelectedCandidate(candidate);
     setSelectedCandidateImage(img);
-    setSelectedCandidateId(id);
     setStep(3);
   };
 
@@ -69,13 +69,13 @@ const ElectionComponent = () => {
       ["address", "uint256"],
       [account.address, selectedCandidateId]
     );
-    const signedMessage = await signMessageAsync({ message: message });
+    const signedMessage = await signMessageAsync({ message: { raw: ethers.getBytes(message) } });
     console.log(signedMessage);
     try {
       if (signedMessage) {
           writeContract({
             abi,
-            address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+            address: "0xbA2DbEfAfA35B2881F4CbB0041133De9BB23785D",
             functionName: "castVote",
             args: [0, signedMessage],
           });
@@ -91,8 +91,6 @@ const ElectionComponent = () => {
     // interact with smart contract and call voting function interaction with contract
     castVote();
     console.log(`Vote submitted for ${selectedCandidate}`);
-
-    if (isContractConfirmed) setStep(4);
   };
 
   const goBack = () => {
@@ -102,6 +100,15 @@ const ElectionComponent = () => {
   useEffect(() => {
     console.log(candidates);
   }, [candidates]);
+
+  useEffect(() => {
+    if (isContractConfirmed) setStep(4);
+  }, [isContractConfirmed])
+
+  useEffect(() => {
+    if(contractError) alert(contractError);
+    console.log(contractError);
+  }, [contractError]) 
 
   return (
     <div className="flex items-center justify-center bg-white">
@@ -148,7 +155,7 @@ const ElectionComponent = () => {
             securely encrypted and anonymous.
           </p>
           <div className="grid grid-cols-2 gap-4 w-full">
-            {candidates ? (
+            {candidates || (candidates as any[])?.length > 0 ? (
               (candidates as any[]).map((candidate: any, idx: number) => (
                 <div
                   onClick={() =>
