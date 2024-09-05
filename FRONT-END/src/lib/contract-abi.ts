@@ -394,6 +394,41 @@ export const abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getCandidates",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "name",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "residentVotes",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "diasporaVotes",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct ZKVoting.Candidate[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "bytes32",
@@ -579,35 +614,7 @@ export const abi = [
   {
     inputs: [],
     name: "tallyVotes",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "id",
-            type: "uint256",
-          },
-          {
-            internalType: "string",
-            name: "name",
-            type: "string",
-          },
-          {
-            internalType: "uint256",
-            name: "residentVotes",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "diasporaVotes",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct ZKVoting.Candidate[]",
-        name: "",
-        type: "tuple[]",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

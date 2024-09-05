@@ -1,52 +1,107 @@
 "use client";
 
-import { frameOne, candidateOne, candidateTwo, candidateThree, candidateFour } from "@/assets";
+import {
+  frameOne,
+  candidateOne,
+  avatarCandidate,
+} from "@/assets";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
-import { useReadContract, useWriteContract, useAccount } from "wagmi";
-import { abi } from '@/lib/contract-abi';
+import { ethers } from "ethers";
+import {
+  useReadContract,
+  useWriteContract,
+  useAccount,
+  useSignMessage,
+  useWaitForTransactionReceipt,
+} from "wagmi";
+import { abi } from "@/lib/contract-abi";
 
 const ElectionComponent = () => {
   const [step, setStep] = useState(1);
-  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
-  const [selectedCandidateImage, setSelectedCandidateImage] = useState<any | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
+    null
+  );
+  const [selectedCandidateImage, setSelectedCandidateImage] = useState<
+    any | null
+  >(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { writeContract } = useWriteContract();
+  const {
+    data: contractHash,
+    error: contractError,
+    isPending: contractLoading,
+    writeContract,
+  } = useWriteContract();
+
+  const { isLoading: isContractConfirming, isSuccess: isContractConfirmed } =
+    useWaitForTransactionReceipt({ hash: contractHash });
+
+  const {
+    data: signMessageData,
+    error,
+    signMessage,
+    signMessageAsync,
+    variables,
+  } = useSignMessage();
+
+  const { data: candidates } = useReadContract({
+    abi,
+    address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+    functionName: "getCandidates",
+  });
+
   const account = useAccount();
 
-  const handleCandidateSelect = (candidate: string, img: any) => {
+  const handleCandidateSelect = (candidate: string, img: any, id: number) => {
     setSelectedCandidate(candidate);
     setSelectedCandidateImage(img);
+    setSelectedCandidateId(id);
     setStep(3);
   };
 
   const castVote = async () => {
-    writeContract({ 
-      abi,
-      address: account.address!,
-      functionName: 'transferFrom',
-      args: [
-        '0xd2135CfB216b74109775236E36d4b433F1DF507B',
-        '0xA0Cf798816D4b9b9866b5330EEa46a18382f251e'
-      ],
-   })
-
-  }
-
+    setLoading(true);
+    const message = ethers.solidityPackedKeccak256(
+      ["address", "uint256"],
+      [account.address, selectedCandidateId]
+    );
+    const signedMessage = await signMessageAsync({ message: message });
+    console.log(signedMessage);
+    try {
+      if (signedMessage) {
+          writeContract({
+            abi,
+            address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+            functionName: "castVote",
+            args: [0, signedMessage],
+          });
+          console.log(contractError, contractLoading);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
 
   const handleVoteSubmit = async () => {
     // interact with smart contract and call voting function interaction with contract
-
+    castVote();
     console.log(`Vote submitted for ${selectedCandidate}`);
-    setStep(4);
+
+    if (isContractConfirmed) setStep(4);
   };
 
   const goBack = () => {
     setStep(step - 1);
   };
+
+  useEffect(() => {
+    console.log(candidates);
+  }, [candidates]);
 
   return (
     <div className="flex items-center justify-center bg-white">
@@ -85,51 +140,38 @@ const ElectionComponent = () => {
           transition={{ duration: 0.3 }}
           className="flex flex-col items-center w-full max-w-md"
         >
-          <h3 className="text-xl font-bold text-center text-black">Choose your Candidate</h3>
+          <h3 className="text-xl font-bold text-center text-black">
+            Choose your Candidate
+          </h3>
           <p className="text-center text-gray-700 mb-4">
-            Select the candidate you wish to vote for. Your vote will be securely encrypted and anonymous.
+            Select the candidate you wish to vote for. Your vote will be
+            securely encrypted and anonymous.
           </p>
           <div className="grid grid-cols-2 gap-4 w-full">
-            <div
-              onClick={() => handleCandidateSelect('Peter Obi', candidateOne)}
-              className={`border rounded-lg p-2 text-left cursor-pointer transition duration-200 ${
-                selectedCandidate === 'Peter Obi' ? 'bg-primary-green text-white' : 'bg-white text-black'
-              }`}
-            >
-              <Image src={candidateOne} alt="Peter Obi" className="rounded-lg" />
-              <h3 className="font-bold">Name: Peter Obi</h3>
-              <p>Party: Labour Party</p>
-            </div>
-            <div
-              onClick={() => handleCandidateSelect('Kwankwaso', candidateTwo)}
-              className={`border rounded-lg p-2 text-left cursor-pointer transition duration-200 ${
-                selectedCandidate === 'Kwankwaso' ? 'bg-primary-green text-white' : 'bg-white text-black'
-              }`}
-            >
-              <Image src={candidateTwo} alt="Kwankwaso" className="rounded-lg" />
-              <h3 className="font-bold">Name: Kwankwaso</h3>
-              <p>Party: NNPP</p>
-            </div>
-            <div
-              onClick={() => handleCandidateSelect('Atiku', candidateThree)}
-              className={`border rounded-lg p-2 text-left cursor-pointer transition duration-200 ${
-                selectedCandidate === 'Atiku' ? 'bg-primary-green text-white' : 'bg-white text-black'
-              }`}
-            >
-              <Image src={candidateThree} alt="Atiku" className="rounded-lg" />
-              <h3 className="font-bold">Name: Atiku</h3>
-              <p>Party: PDP</p>
-            </div>
-            <div
-              onClick={() => handleCandidateSelect('Tinubu', candidateFour)}
-              className={`border rounded-lg p-2 text-left cursor-pointer transition duration-200 ${
-                selectedCandidate === 'Tinubu' ? 'bg-primary-green text-white' : 'bg-white text-black'
-              }`}
-            >
-              <Image src={candidateFour} alt="Tinubu" className="rounded-lg" />
-              <h3 className="font-bold">Name: Tinubu</h3>
-              <p>Party: APC</p>
-            </div>
+            {candidates ? (
+              (candidates as any[]).map((candidate: any, idx: number) => (
+                <div
+                  onClick={() =>
+                    handleCandidateSelect(candidate.name, avatarCandidate, idx)
+                  }
+                  key={`${candidate.name}-${idx}`}
+                  className={`border rounded-lg p-2 text-left cursor-pointer transition duration-200 ${
+                    selectedCandidate === candidate.name
+                      ? "bg-primary-green text-white"
+                      : "bg-white text-black"
+                  }`}
+                >
+                  <Image
+                    src={avatarCandidate}
+                    alt="avatar"
+                    className="rounded-lg max-h-[200px] "
+                  />
+                  <h3 className="font-bold mt-3 text-lg p-4 truncate">Name: {candidate.name}</h3>
+                </div>
+              ))
+            ) : (
+              <>No candidates to show</>
+            )}
           </div>
           <button
             onClick={() => setStep(3)}
@@ -147,21 +189,33 @@ const ElectionComponent = () => {
           transition={{ duration: 0.3 }}
           className="flex flex-col items-center w-full max-w-md"
         >
-          <h1 className="text-2xl text-black font-bold mb-6">Confirm your Vote</h1>
+          <h1 className="text-2xl text-black font-bold mb-6">
+            Confirm your Vote
+          </h1>
           <div className="w-full p-6 rounded-lg text-center">
             <div className="flex flex-col items-center mb-4">
               <div className="border rounded-lg p-2 text-left bg-primary-green text-white">
-                <Image src={selectedCandidateImage ?? candidateOne} alt={'selectedCandidate'} className="rounded-lg" />
+                <Image
+                  src={selectedCandidateImage ?? candidateOne}
+                  alt={"selectedCandidate"}
+                  className="rounded-lg"
+                />
                 <h3 className="font-bold">Name: {selectedCandidate}</h3>
-                <p>Party: 
-                  {selectedCandidate === 'Peter Obi' ? 'Labour Party' : 
-                  selectedCandidate === 'Kwankwaso' ? 'NNPP' : 
-                  selectedCandidate === 'Atiku' ? 'PDP' : 'APC'}
+                <p>
+                  Party:
+                  {selectedCandidate === "Peter Obi"
+                    ? "Labour Party"
+                    : selectedCandidate === "Kwankwaso"
+                    ? "NNPP"
+                    : selectedCandidate === "Atiku"
+                    ? "PDP"
+                    : "APC"}
                 </p>
               </div>
             </div>
             <p className="text-sm text-black mb-6">
-              Please review your selected candidate. Once confirmed, your vote will be encrypted and submitted.
+              Please review your selected candidate. Once confirmed, your vote
+              will be encrypted and submitted.
             </p>
             <button
               onClick={handleVoteSubmit}
@@ -187,13 +241,17 @@ const ElectionComponent = () => {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
         >
           <div className="bg-white rounded-xl p-6 w-4/5 max-w-sm shadow-lg text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Vote Successful</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Vote Successful
+            </h2>
             <div className="flex justify-center mb-4">
               <BadgeCheck className="text-green-500 w-12 h-12" />
             </div>
-            <p className="text-lg font-medium text-gray-900 mb-4">Your vote has been submitted successfully!</p>
+            <p className="text-lg font-medium text-gray-900 mb-4">
+              Your vote has been submitted successfully!
+            </p>
             <Link
-              href={'/elections/results'}
+              href={"/elections/results"}
               className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 mb-6"
             >
               Monitor Election Progress →

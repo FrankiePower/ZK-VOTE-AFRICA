@@ -1,8 +1,7 @@
 "use client";
 
-import { getAddress } from "@/lib";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { BadgeCheck, BadgeX, Loader, LoaderCircle, X } from "lucide-react";
+import { BadgeCheck, BadgeX, LoaderCircle, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,11 +12,11 @@ import {
   useWaitForTransactionReceipt,
   useConnect,
   useVerifyMessage,
+  useWriteContract,
 } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { abi } from "@/lib/contract-abi";
 
 interface IverifiedModal {
-  isOpen: boolean;
   onClose: () => void;
   name?: string;
   ethAddress?: string;
@@ -28,33 +27,28 @@ interface IverifiedModal {
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const VerifiedModal = ({
-  isOpen,
   onClose,
   ethAddress,
   ensName,
   details,
 }: IverifiedModal) => {
-  if (!isOpen) return null;
-
-  const {
-    data: hash,
-    error: SendTransactionError,
-    isPending,
-    sendTransaction,
-  } = useSendTransaction();
-  const { connect } = useConnect();
   const [verified, setVerified] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
-  const {
-    data: signMessageData,
-    error,
-    signMessage,
-    variables,
-  } = useSignMessage();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
+  const [voterType, setVoterType] = useState(0);
+
+  const { data: signMessageData, signMessage } = useSignMessage();
+
   const account = useAccount();
   const router = useRouter();
+  const {
+    data: contractHash,
+    error: contractError,
+    isPending: contractLoading,
+    writeContract,
+  } = useWriteContract();
+
+  const { isLoading: isContractConfirming, isSuccess: isContractConfirmed } =
+    useWaitForTransactionReceipt({ hash: contractHash });
 
   // useVerifyMessage should be used outside of useEffect
   const {
@@ -74,9 +68,17 @@ const VerifiedModal = ({
       console.log(verifyResult);
 
       if (verifyResult) {
+        writeContract({
+          abi,
+          address: "0x499Ba5983D885e5647163801BD03C2Bd9095b8E3",
+          functionName: "registerVoter",
+          args: [account.address, voterType],
+        });
+        console.log("contract called");
+        console.log(contractLoading);
+
         setVerified(verifyResult);
       }
-      // setVerified(verifyResult);
     }
     setVerificationLoading(false);
   }, [signMessageData, verifyResult]);
@@ -86,6 +88,13 @@ const VerifiedModal = ({
     const message = `Verify ownership of ${ensName}`;
     signMessage({ message });
   };
+
+  useEffect(() => {
+    if (contractLoading) console.log("contract loading");
+    if (isContractConfirming) console.log("contract confirming");
+    if (isContractConfirmed) console.log("contract confirmed");
+    if (contractError) console.log("contract error");
+  }, [isContractConfirming, isContractConfirmed, contractError]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 h-screen -mt-20 -top-10">
@@ -164,6 +173,25 @@ const VerifiedModal = ({
             </div>
           </div>
         )}
+
+        <div className="w-full mt-3">
+          <label
+            htmlFor="location"
+            className="block text-sm text-left text-gray-600 font-medium"
+          >
+            Select Voter Location
+          </label>
+          <select
+            id="location"
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green sm:text-sm"
+            onChange={({ target: { value } }) =>
+              setVoterType(parseInt(value) ?? 0)
+            }
+          >
+            <option value={0}>In the Country</option>
+            <option value={1}>Diaspora</option>
+          </select>
+        </div>
 
         {signMessageData && (
           <p

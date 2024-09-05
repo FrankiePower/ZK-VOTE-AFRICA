@@ -15,7 +15,7 @@ import candidateTwo from "./knw.png"
 import candidateThree from "./atiku.png"
 import candidateFour from "./tnb.png"
 import lisk from './lisk.png';
-
+import avatarCandidate from './avatar-candidate.png';
 
 export {
     onboardOne,
@@ -35,4 +35,5 @@ export {
     candidateThree,
     candidateFour,
     lisk,
+    avatarCandidate,
 }

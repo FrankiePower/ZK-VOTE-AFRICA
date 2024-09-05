@@ -1,15 +1,15 @@
 const { Chain, EnsPlugin } = require("@namespace-ens/web3-plugin-ens");
 import { Web3 } from "web3";
 import { useMemo } from "react";
-import type { Chain as ChainType, Client, Transport } from "viem";
-import { type Config, useClient, useConnectorClient } from "wagmi";
+// import type { Chain as ChainType, Client, Transport } from "viem";
+// import { type Config, useClient, useConnectorClient } from "wagmi";
 const web3 = new Web3(process.env.NEXT_PUBLIC_RPC_URL);
 
 web3.registerPlugin(new EnsPlugin(Chain.Sepolia));
 
 // web3.eth.accounts.wallet.add("PRIVATE_KEY");
 
-export async function verifyEns(ensName: string) {
+export async function verifyEns(ensName) {
   try {
     const address = await getAddress(ensName);
     const otherRecords = await getTextRecords(ensName);
@@ -20,7 +20,7 @@ export async function verifyEns(ensName: string) {
   }
 }
 
-export async function getAddress(ensName: string) {
+async function getAddress(ensName) {
   try {
     const address = await web3.ens.getAddress(ensName);
     console.log("getting address");
@@ -31,7 +31,7 @@ export async function getAddress(ensName: string) {
   }
 }
 
-async function getTextRecords(ensName: string) {
+async function getTextRecords(ensName) {
   try {
     const textRecords = await web3.ens.getTextRecords(ensName, [
       "email",
@@ -46,7 +46,7 @@ async function getTextRecords(ensName: string) {
   }
 }
 
-export function clientToWeb3js(client?: Client<Transport, ChainType>) {
+export function clientToWeb3js(client) {
   if (!client) {
     return new Web3();
   }
@@ -60,13 +60,13 @@ export function clientToWeb3js(client?: Client<Transport, ChainType>) {
 }
 
 /** Action to convert a viem Client to a web3.js Instance. */
-export function useWeb3js({ chainId }: { chainId?: number } = {}) {
+export function useWeb3js({ chainId }) {
   const client = useClient<Config>({ chainId });
   return useMemo(() => clientToWeb3js(client), [client]);
 }
 
 /** Action to convert a viem ConnectorClient to a web3.js Instance. */
-export function useWeb3jsSigner({ chainId }: { chainId?: number } = {}) {
+export function useWeb3jsSigner({ chainId }) {
   const { data: client } = useConnectorClient<Config>({ chainId });
   return useMemo(() => clientToWeb3js(client), [client]);
 }
