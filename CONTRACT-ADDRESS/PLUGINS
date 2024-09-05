@@ -1,0 +1,18 @@
+@namespace-ens/web3-plugin-ens
+
+Namespace ENS Web3 Plugin Integration
+
+In our project, we have integrated the Namespace ENS Web3 Plugin to extend our Web3 capabilities for managing ENS domains. Here’s a brief overview of how we implemented and used the plugin:
+
+Plugin Setup:
+
+We initialized the Web3 instance with either a public connection (such as MetaMask) or a private RPC URL. For private connections, we also added our private key to the Web3 wallet.
+The ENS Plugin was registered with Web3, specifying the appropriate Ethereum chain (Sepolia or Mainnet) to use the ENS functionalities.
+Getting an Address:
+
+We utilized the plugin to resolve and retrieve the Ethereum address associated with a given ENS domain name. This allows us to look up which address a specific ENS name resolves to.
+Setting and Getting Text Records:
+
+We set up and managed text records for ENS domains. This involves adding or updating key-value pairs of text records for a domain. We also have the capability to remove specific records as needed.
+To retrieve text records, we queried the ENS domain for specific keys, allowing us to access the stored values associated with those keys.
+This implementation enables efficient management of ENS names, addresses, and text records within our Web3 project.
